@@ -8,5 +8,6 @@ public class Main {
 		game.readFile();
 		game.selectCategory();
 		game.selectRandomWord();
+		game.begginGameLoop();
 	}
 }
