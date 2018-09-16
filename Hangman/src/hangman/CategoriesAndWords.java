@@ -15,7 +15,7 @@ public abstract  class CategoriesAndWords {
 		CategoriesAndWordsModel.setData(currentKey, tempValues);
 	}
 	public static void readFile() {
-		System.out.println("Reading from file " + DEFAULT_SRC); // READ START
+		//System.out.println("Reading from file " + DEFAULT_SRC); // READ START
 		try (BufferedReader br = new BufferedReader(new FileReader(DEFAULT_SRC))) {
 			String line;
 			String currentKey = null;
@@ -33,7 +33,7 @@ public abstract  class CategoriesAndWords {
 				}
 			}
 			addValues(currentKey, currentValues);
-			System.out.println("Succesfully read file info!"); // READ END
+			//System.out.println("Succesfully read file info!"); // READ END
 		} catch (IOException e) {
 			System.out.println(e.getStackTrace());
 		}

@@ -14,18 +14,21 @@ public class GameController {
 	private Scanner sc = new Scanner(System.in);
 	private String selectedCategory = "";
 	private String selectedWord = "";
-	private ArrayList<Character> letterMatch = new ArrayList<Character>();
-	private final String USER_INPUT_PATTERN = "^\\w{1}$";
+	private ArrayList<Character> letterMatch;
+	private final String USER_INPUT_PATTERN = "^[a-zA-Z]{1}$"; // tudu Extract all Regular Expressions here!
 	private char[] gameWord;
+	private String selectedWordLowerCase;
+	private Player player = new Player();
 
 	public void readFile() {
 		CategoriesAndWords.readFile();
 	}
 
 	public void selectCategory() {
-		System.out.println(GameEnums.SELECT_CATEGORY.value());
+
 		Set<String> allCategories = CategoriesAndWordsModel.getCategories();
 		allCategories.forEach((category) -> System.out.println(category));
+		System.out.print(GameEnums.SELECT_CATEGORY.value());
 		this.selectedCategory = sc.nextLine();
 
 		while (!allCategories.contains(selectedCategory)) {
@@ -41,21 +44,19 @@ public class GameController {
 		Random rnd = new Random();
 		int rndValue = rnd.nextInt(num);
 		this.selectedWord = CategoriesAndWordsModel.getData().get(this.selectedCategory).get(rndValue);
-	}
-
-	private void printWord() {
-
-		System.out.println(String.valueOf(this.gameWord).replaceAll("", " ").trim());
-
+		this.selectedWordLowerCase = this.selectedWord.toLowerCase();
+		CategoriesAndWordsModel.removeWord(selectedCategory, selectedWord);
 	}
 
 	public void begginGameLoop() {
-
-		this.gameWord = this.selectedWord.replaceAll("[A-Za-z]", "_").toCharArray();
+		letterMatch = new ArrayList<Character>();
+		this.selectCategory();
+		this.selectRandomWord();
+		this.gameWord = this.selectedWord.replaceAll("[\\w]", "_").toCharArray();
+		
 		do {
 			this.uncoverLetter();
 			this.printWord();
-			// Select Player
 			this.getUserInput();
 
 		} while (true);
@@ -71,30 +72,43 @@ public class GameController {
 	private void getUserInput() {
 		String userInput;
 		do {
-			System.out.println("Player" + " please enter a single valid letter: ");
+			System.out.print(GameEnums.USER_INPUT.value());
 			userInput = sc.nextLine();
 		} while (!validateUserInput(userInput));
-		char temp = userInput.charAt(0);
+		char temp = Character.toLowerCase(userInput.charAt(0));
 		if (!letterMatch.contains(temp))
 			letterMatch.add(temp);
 		else {
-			System.out.println("");
+			System.out.println(GameEnums.USED_LETTER.value());
 			this.getUserInput();
 		}
 	}
 
 	private void uncoverLetter() {
 
-		
 		char charInput = this.getLatestInputChar();
 		if (charInput != ' ') {
-			for (int index = this.selectedWord.indexOf(charInput);
-					 index >= 0;
-					 index = this.selectedWord.indexOf(charInput, index + 1)) 
-			{
-				this.gameWord[index] = charInput;
+			boolean guessed = false;
+			for (int index = selectedWordLowerCase.indexOf(charInput); index >= 0; index = selectedWordLowerCase
+					.indexOf(charInput, index + 1)) {
+				this.gameWord[index] = selectedWord.charAt(index);
+				guessed = true;
 			}
+			if (!guessed) {
+				this.player.minusMove();
+				System.out.println(GameEnums.USER_ATTEMPTS_LEFT.value()+this.player.getMoves());
+				if(this.player.getMoves()==0) {
+					this.gameOver();
+				}
+			}else this.gameContinue();
 		}
+
+	}
+
+	private void printWord() {
+
+		String tempValue = String.valueOf(this.gameWord).replaceAll("\\b(?!\\s)|\\B(?!\\s)", " ").trim();
+		System.out.println(tempValue);
 
 	}
 
@@ -105,5 +119,29 @@ public class GameController {
 			latestInput = this.letterMatch.get(size - 1);
 		}
 		return latestInput;
+	}
+	
+	private void gameOver() {
+		System.out.println(GameEnums.USER_GAME_OVER.value());
+		this.printGameScore();
+		System.exit(0);
+		
+	}
+	
+	private void printGameScore() {
+		System.out.println(GameEnums.USER_CURRENT_SCORE.value()+this.player.getScore());
+	}
+	
+	private boolean wordGuessed() {
+		return !String.valueOf(this.gameWord).contains("_");
+	}
+	
+	private void gameContinue() {
+		if(this.wordGuessed()) {
+			this.player.addScore();
+			this.player.resetMoves();
+			System.out.println(GameEnums.USER_WIN.value()+GameEnums.USER_CURRENT_SCORE.value()+this.player.getScore());
+			this.begginGameLoop();
+		}		
 	}
 }

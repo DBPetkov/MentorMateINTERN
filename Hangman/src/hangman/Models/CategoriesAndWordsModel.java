@@ -16,6 +16,11 @@ public class CategoriesAndWordsModel {
 		data.put(key, value);
 	}
 	
+	public static void removeWord(String key, String value) {
+		
+		data.get(key).remove(value);
+	}
+	
 	public static Set<String> getCategories() {
 		return data.keySet();
 	}

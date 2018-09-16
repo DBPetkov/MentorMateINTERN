@@ -6,8 +6,7 @@ public class Main {
 		
 		GameController game = new GameController();
 		game.readFile();
-		game.selectCategory();
-		game.selectRandomWord();
 		game.begginGameLoop();
+		
 	}
 }
