@@ -33,7 +33,7 @@ public abstract  class CategoriesAndWords {
 				}
 			}
 			addValues(currentKey, currentValues);
-			//System.out.println("Succesfully read file info!"); // READ END
+			//System.out.println("Successfully read file info!"); // READ END
 		} catch (IOException e) {
 			System.out.println(e.getStackTrace());
 		}
